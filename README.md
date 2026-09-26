@@ -13,7 +13,8 @@ Turn unknown legacy code into a system you can change with confidence.<br>
 </p>
 
 <p>
-<img alt="Chalmers Hackathon 2026, Saab track" src="https://img.shields.io/badge/Chalmers%20Hackathon%202026-Saab%20track-79716b?style=flat-square&labelColor=e7e5e4">
+<a href="https://builderbase.com/event/gothenburg-tech-week-x-chalmers-hackathon"><img alt="Gothenburg Tech Week x Chalmers Hackathon 2026" src="https://img.shields.io/badge/Chalmers%20Hackathon-2026-79716b?style=flat-square&labelColor=e7e5e4"></a>
+<a href="https://www.saab.com/"><img alt="Saab Challenge" src="https://img.shields.io/badge/Saab-Challenge-79716b?style=flat-square&labelColor=e7e5e4"></a>
 </p>
 
 <br>
@@ -63,8 +64,8 @@ a commit you can click through to.
 
 One scan runs five stages, then everything in the app reads from the model they build.
 
-| Stage              | What it does                                                                                                                                               |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stage          | What it does                                                                                                                                               |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Acquire**    | Blobless clone, batch-fetched blobs, inventory of the tree                                                                                                 |
 | **Structure**  | Our own syntax-level C/C++ scanner: symbols, call and reference edges                                                                                      |
 | **Git mining** | Commits, blame, co-change and authors, down to the history of single lines                                                                                 |
@@ -85,6 +86,7 @@ npm run dev            # http://localhost:5173
 
 GitHub sign-in needs an [OAuth app](https://github.com/settings/applications/new) (callback
 `<ORIGIN>/api/auth/callback/github`). Without one, only guest mode is avaliable: no account, public repositories only.
+
 ## Stack
 
 SvelteKit 2, Svelte 5, TypeScript, Tailwind v4 and shadcn-svelte (Mira, stone, IBM Plex) ·
@@ -92,5 +94,5 @@ Better Auth (GitHub) · Drizzle on SQLite · graphology + Louvain · 3d-force-gr
 OpenAI SDK against a Gonka broker · Vitest and Playwright.
 
 <div align="center">
-<sub>Built at Gothenburg Tech Week × Chalmers Hackathon 2026, for Saab's challenge:<br><i>How might we use AI to understand legacy embedded systems?</i></sub>
+<sub>Built at <a href="https://builderbase.com/event/gothenburg-tech-week-x-chalmers-hackathon">Gothenburg Tech Week × Chalmers Hackathon 2026</a>, for <a href="https://www.saab.com/">Saab</a>'s challenge:<br><i>How might we use AI to understand legacy embedded systems?</i></sub>
 </div>
