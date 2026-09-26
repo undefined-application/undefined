@@ -125,7 +125,7 @@ UI: shadcn-svelte, style **Mira**, preset `b5deNMQ2S` (stone, no accent colour, 
 **Run:**
 ```sh
 npm install
-cp .env.example .env         # fill GITHUB_CLIENT_ID/SECRET, BETTER_AUTH_SECRET, LLM_BASE_URL/LLM_API_KEY
+cp .env.example .env         # fill GITHUB_CLIENT_ID/SECRET (optional, else guest mode), BETTER_AUTH_SECRET, LLM_BASE_URL/LLM_API_KEY
 npm run db:push              # create/update tables in local.db (rerun after schema changes; confirm the prompt)
 npm run dev                  # http://localhost:5173
 npm run check                # svelte-check / types
@@ -145,7 +145,7 @@ Without `LLM_BASE_URL` / `LLM_API_KEY` everything deterministic still works; cha
 - A snapshot (commit + scopes + config + `PARSER_VERSION`) is analysed once; rescans reuse it. Bump `PARSER_VERSION` in `snapshot.ts` when analysis output changes.
 - Jobs are in-memory (concurrency 1); server start marks unfinished scans and reviews failed.
 
-**GitHub OAuth app:** callback `<ORIGIN>/api/auth/callback/github`. Scopes `read:user user:email repo`.
+**GitHub OAuth app:** https://github.com/settings/applications/new, callback `<ORIGIN>/api/auth/callback/github`. Not configured → guest mode (`server/guest.ts`, public repos only).
 
 **UI rules (docs/ui-spec.md):**
 - Colours are tokens in `src/routes/layout.css`: `bg-background`, `text-link` (foreground + underline on links), status `stop / dangerous / risky / safe`, PR states `pr-open / pr-merged / pr-closed`. Status colour always comes with an icon and a word.
@@ -173,7 +173,8 @@ src/lib/components/                 AppHeader, UserMenu, ThemeToggle, ClaimBadge
   graph/                            Graph3D (3d-force-graph wrapper), scene.ts (palettes, focusOf), NodeInspector, BlastMeter, HeroGraph (login)
   scan/                             SystemNav, SystemCard, NewScanDialog, DeleteRepoDialog, ScanProgress, ScanFacts, CriticalPart, SystemSummary, toc.svelte.ts, actions.ts
   review/                           PullList, PullStateIcon, ReviewRows, DiffView, ImpactGraph, OverrideDialog
-src/lib/server/auth.ts              betterAuth config (GitHub only)
+src/lib/server/auth.ts              betterAuth config (GitHub only), githubAuthEnabled
+src/lib/server/guest.ts             guest mode: shared local user + cookie (no OAuth app configured)
 src/lib/server/github.ts            GitHub REST via user's OAuth token: repos, branches, pulls, commit → login
 src/lib/server/jobs/                queue.ts (in-memory, concurrency 1); yield.ts (tick() for CPU-heavy loops)
 src/lib/server/db/                  drizzle client + schema: auth (generated), scan.schema.ts, review.schema.ts

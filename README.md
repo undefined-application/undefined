@@ -78,13 +78,13 @@ review rationale and the generated overview, and a validator downgrades any clai
 
 ```sh
 npm install
-cp .env.example .env   # GitHub OAuth app, BETTER_AUTH_SECRET, optional LLM_BASE_URL / LLM_API_KEY
+cp .env.example .env   # optional GitHub OAuth app, BETTER_AUTH_SECRET, optional LLM_BASE_URL / LLM_API_KEY
 npm run db:push        # create or update the tables in local.db (confirm the prompt)
 npm run dev            # http://localhost:5173
 ```
 
-The GitHub OAuth app needs the callback `<ORIGIN>/api/auth/callback/github`.
-
+GitHub sign-in needs an [OAuth app](https://github.com/settings/applications/new) (callback
+`<ORIGIN>/api/auth/callback/github`). Without one, only guest mode is avaliable: no account, public repositories only.
 ## Stack
 
 SvelteKit 2, Svelte 5, TypeScript, Tailwind v4 and shadcn-svelte (Mira, stone, IBM Plex) ·
