@@ -1,7 +1,8 @@
 import { error, redirect, type Handle, type ServerInit } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import { building } from '$app/environment';
-import { auth } from '$lib/server/auth';
+import { auth, githubAuthEnabled } from '$lib/server/auth';
+import { GUEST_COOKIE, guestUser } from '$lib/server/guest';
 import { markInterruptedReviews } from '$lib/server/review';
 import { markInterruptedScans } from '$lib/server/scan';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
@@ -20,6 +21,9 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 	if (session) {
 		event.locals.session = session.session;
 		event.locals.user = session.user;
+	} else if (!githubAuthEnabled && event.cookies.get(GUEST_COOKIE)) {
+		// Guest mode: no GitHub OAuth app, so no sessions; the cookie only says "entered as guest".
+		event.locals.user = guestUser();
 	}
 
 	return svelteKitHandler({ event, resolve, auth, building });

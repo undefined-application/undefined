@@ -17,10 +17,12 @@
 
 	interface Props {
 		repos: Promise<RepoSummary[]>;
+		/** Guest mode: no GitHub account, so only public repositories. */
+		guest?: boolean;
 		open?: boolean;
 	}
 
-	let { repos, open = $bindable(false) }: Props = $props();
+	let { repos, guest = false, open = $bindable(false) }: Props = $props();
 
 	let query = $state('');
 	let repo = $state<RepoSummary | null>(null);
@@ -241,7 +243,9 @@
 					<Field.Error>{repoError}</Field.Error>
 				{:else}
 					<Field.Description class="flex flex-wrap items-center gap-x-1">
-						Your GitHub repositories, or any public one.
+						{guest
+							? 'Any public GitHub repository.'
+							: 'Your GitHub repositories, or any public one.'}
 						<button
 							type="button"
 							class="inline-flex items-center gap-1 text-link hover:underline"

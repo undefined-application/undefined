@@ -110,7 +110,7 @@
 	{/if}
 </main>
 
-<NewScanDialog repos={data.repos} bind:open={newScanOpen} />
+<NewScanDialog repos={data.repos} guest={data.user.guest} bind:open={newScanOpen} />
 {#if target}
 	<DeleteRepoDialog
 		repo={target.repo}

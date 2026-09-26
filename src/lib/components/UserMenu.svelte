@@ -4,7 +4,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 
 	interface Props {
-		user: { name: string; email: string; image?: string | null };
+		user: { name: string; email: string; image?: string | null; guest?: boolean };
 	}
 
 	let { user }: Props = $props();
@@ -37,12 +37,14 @@
 	<DropdownMenu.Content align="end" class="w-56">
 		<DropdownMenu.Label class="grid gap-0.5">
 			<span class="truncate text-xs font-medium text-foreground">{user.name}</span>
-			<span class="truncate text-[11px] font-normal text-muted-foreground">{user.email}</span>
+			<span class="truncate text-[11px] font-normal text-muted-foreground">
+				{user.guest ? 'No account, public repositories only' : user.email}
+			</span>
 		</DropdownMenu.Label>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Item onSelect={() => logoutForm?.requestSubmit()}>
 			<LogOutIcon />
-			Sign out
+			{user.guest ? 'Leave guest mode' : 'Sign out'}
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

@@ -69,7 +69,7 @@
 	<div class="px-2">
 		<p class="truncate text-xs text-muted-foreground">{scan.repo}</p>
 		<p class="mt-0.5 truncate text-[13px] font-medium text-foreground">
-			{scan.deepScope || 'whole repository'}
+			{scan.deepScope || 'Entire repository'}
 		</p>
 	</div>
 

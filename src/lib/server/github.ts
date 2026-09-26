@@ -4,6 +4,7 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { account } from '$lib/server/db/schema';
 import { auth } from '$lib/server/auth';
+import { GUEST_USER_ID } from '$lib/server/guest';
 import type { BranchSummary, PullSummary, RepoSummary } from '$lib/github';
 
 const API = 'https://api.github.com';
@@ -21,8 +22,12 @@ async function githubSessionExpired(message: string): Promise<never> {
 	error(401, message);
 }
 
-/** The signed-in user's GitHub OAuth token. OAuth-app tokens don't expire, so no refresh. */
+/**
+ * The signed-in user's GitHub OAuth token. OAuth-app tokens don't expire, so no refresh.
+ * The guest (no OAuth app configured) gets '': anonymous API calls and clones, public repos only.
+ */
 export async function getGithubToken(userId: string): Promise<string> {
+	if (userId === GUEST_USER_ID) return '';
 	const [row] = await db
 		.select({ accessToken: account.accessToken })
 		.from(account)
@@ -35,14 +40,13 @@ export async function getGithubToken(userId: string): Promise<string> {
 }
 
 async function gh(token: string, url: string, accept = 'application/vnd.github+json') {
-	const res = await fetch(url.startsWith('http') ? url : `${API}${url}`, {
-		headers: {
-			Accept: accept,
-			Authorization: `Bearer ${token}`,
-			'X-GitHub-Api-Version': '2022-11-28'
-		}
-	});
+	const headers: Record<string, string> = { Accept: accept, 'X-GitHub-Api-Version': '2022-11-28' };
+	if (token) headers.Authorization = `Bearer ${token}`;
+	const res = await fetch(url.startsWith('http') ? url : `${API}${url}`, { headers });
 	if (res.status === 401) await githubSessionExpired('GitHub sign-in expired. Sign in again.');
+	// Anonymous calls (guest mode) share GitHub's 60 requests/hour per IP.
+	if (!token && (res.status === 403 || res.status === 429))
+		error(429, 'GitHub rate limit for anonymous access reached. Try again later.');
 	// GitHub answers 404 for private repos the token can't see; 422 for unknown refs.
 	if (res.status === 404 || res.status === 422) error(404, `GitHub: not found (${url})`);
 	if (!res.ok) error(502, `GitHub ${res.status} on ${url}`);
@@ -90,6 +94,7 @@ const toRepoSummary = (r: GithubRepo): RepoSummary => ({
 });
 
 export async function listRepos(token: string): Promise<RepoSummary[]> {
+	if (!token) return []; // Guest: no account, so no "your repositories".
 	const repos = await getAllPages<GithubRepo>(
 		token,
 		'/user/repos?per_page=100&sort=pushed&affiliation=owner,collaborator,organization_member'
@@ -97,7 +102,7 @@ export async function listRepos(token: string): Promise<RepoSummary[]> {
 	return repos.map(toRepoSummary);
 }
 
-/** Any repo the token can read, including public repos the user doesn't own. */
+/** Any repo the token can read, including public repos the user doesn't own (only public ones without a token). */
 export async function getRepo(token: string, owner: string, repo: string): Promise<RepoSummary> {
 	const res = await gh(token, repoPath(owner, repo));
 	return toRepoSummary((await res.json()) as GithubRepo);

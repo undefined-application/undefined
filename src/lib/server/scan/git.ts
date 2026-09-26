@@ -5,7 +5,10 @@ import { yielder } from '$lib/server/jobs/yield';
 const exec = promisify(execFile);
 
 export interface GitAuth {
-	/** GitHub OAuth token. Passed via env-scoped git config, never written to disk or argv. */
+	/**
+	 * GitHub OAuth token. Passed via env-scoped git config, never written to disk or argv.
+	 * Empty in guest mode: anonymous clone, public repos only.
+	 */
 	token: string;
 }
 
@@ -21,7 +24,7 @@ export interface GitOptions {
 /** Run git without a shell; arguments are never interpolated. Returns stdout. */
 export async function git(args: string[], opts: GitOptions = {}): Promise<string> {
 	const env: NodeJS.ProcessEnv = { ...process.env, ...opts.env, GIT_TERMINAL_PROMPT: '0' };
-	if (opts.auth) {
+	if (opts.auth?.token) {
 		const basic = Buffer.from(`x-access-token:${opts.auth.token}`).toString('base64');
 		env.GIT_CONFIG_COUNT = '1';
 		env.GIT_CONFIG_KEY_0 = 'http.https://github.com/.extraHeader';

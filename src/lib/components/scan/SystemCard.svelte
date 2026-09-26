@@ -57,7 +57,7 @@
 				>
 			</p>
 			<p class="mt-1 truncate text-[11.5px] text-muted-foreground">
-				{scan.deepScope || 'whole repository'}
+				{scan.deepScope || 'Entire repository'}
 			</p>
 		</div>
 		<DropdownMenu.Root>

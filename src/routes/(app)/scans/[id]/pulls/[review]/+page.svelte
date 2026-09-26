@@ -572,7 +572,7 @@
 						<h3 class="mb-2 text-xs font-semibold text-muted-foreground">Scope</h3>
 						<p class="flex items-center gap-1.5 text-[11.5px]">
 							<GitBranchIcon class="size-3 text-muted-foreground" />
-							{r.scope.deepScope || 'whole repository'}
+							{r.scope.deepScope || 'Entire repository'}
 						</p>
 						{#if r.scope.fromScan}
 							<a

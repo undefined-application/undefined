@@ -6,10 +6,12 @@
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { APP_NAME } from '$lib/config';
-	import type { ActionData } from './$types';
+	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
+	import type { ActionData, PageData } from './$types';
 
-	let { form }: { form: ActionData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let pending = $state(false);
+	let guestPending = $state(false);
 </script>
 
 <svelte:head>
@@ -45,7 +47,7 @@
 					type="submit"
 					size="lg"
 					class="h-10 pressable gap-2.5 px-4 text-sm"
-					disabled={pending}
+					disabled={pending || !data.githubEnabled}
 				>
 					{#if pending}
 						<Loader2Icon class="size-4 animate-spin" />
@@ -55,6 +57,25 @@
 					Continue with GitHub
 				</Button>
 			</form>
+			{#if !data.githubEnabled}
+				<p class="mt-2 text-xs text-muted-foreground">
+					GitHub sign-in is not configured.
+				</p>
+
+				<form method="post" action="?/guest" class="mt-5" onsubmit={() => (guestPending = true)}>
+					<Button
+						type="submit"
+						variant="outline"
+						size="lg"
+						class="h-10 pressable gap-2 px-4 text-sm"
+						disabled={guestPending}
+					>
+						{#if guestPending}<Loader2Icon class="size-4 animate-spin" />{/if}
+						Continue without an account
+						<ArrowRightIcon class="size-4" />
+					</Button>
+				</form>
+			{/if}
 			{#if form?.message}
 				<p role="alert" class="mt-3 text-sm text-destructive">{form.message}</p>
 			{/if}

@@ -12,7 +12,7 @@
 	import type { ScanSummary } from '$lib/scan';
 
 	interface Props {
-		user: { name: string; email: string; image?: string | null };
+		user: { name: string; email: string; image?: string | null; guest?: boolean };
 	}
 
 	let { user }: Props = $props();
