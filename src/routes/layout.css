@@ -1,0 +1,355 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+@import '@fontsource-variable/ibm-plex-sans';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * shadcn preset b5deNMQ2S (style mira, base colour stone, IBM Plex Sans) with its teal theme
+ * swapped for stone's neutral primary: the app has no accent colour (docs/ui-spec.md §1).
+ * Status colours are semantic, never decoration.
+ */
+:root {
+	--radius: 0.625rem;
+	--background: oklch(0.99 0.0015 106.42);
+	--foreground: oklch(0.147 0.004 49.25);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.147 0.004 49.25);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.147 0.004 49.25);
+	--primary: oklch(0.216 0.006 56.043);
+	--primary-foreground: oklch(0.985 0.001 106.423);
+	--secondary: oklch(0.967 0.001 286.375);
+	--secondary-foreground: oklch(0.21 0.006 285.885);
+	--muted: oklch(0.97 0.001 106.424);
+	--muted-foreground: oklch(0.553 0.013 58.071);
+	--accent: oklch(0.97 0.001 106.424);
+	--accent-foreground: oklch(0.216 0.006 56.043);
+	--destructive: oklch(0.577 0.245 27.325);
+	--border: oklch(0.923 0.003 48.717);
+	--input: oklch(0.923 0.003 48.717);
+	--ring: oklch(0.709 0.01 56.259);
+	--chart-1: oklch(0.869 0.005 56.366);
+	--chart-2: oklch(0.709 0.01 56.259);
+	--chart-3: oklch(0.553 0.013 58.071);
+	--chart-4: oklch(0.444 0.011 73.639);
+	--chart-5: oklch(0.268 0.007 34.298);
+	--sidebar: oklch(0.985 0.001 106.423);
+	--sidebar-foreground: oklch(0.147 0.004 49.25);
+	--sidebar-primary: oklch(0.216 0.006 56.043);
+	--sidebar-primary-foreground: oklch(0.985 0.001 106.423);
+	--sidebar-accent: oklch(0.955 0.002 106.424);
+	--sidebar-accent-foreground: oklch(0.216 0.006 56.043);
+	--sidebar-border: oklch(0.923 0.003 48.717);
+	--sidebar-ring: oklch(0.709 0.01 56.259);
+
+	/* No accent colour: links and highlights are plain foreground, links carry an underline. */
+	--link: var(--foreground);
+	/* The grey "un" of the wordmark. */
+	--brand-un: oklch(0.65 0.013 264);
+	/* Verdicts, criticality, claim labels. */
+	--stop: oklch(0.577 0.245 27.325);
+	--dangerous: oklch(0.646 0.222 41.116);
+	--risky: oklch(0.666 0.179 58.318);
+	--safe: oklch(0.627 0.194 149.214);
+	/* GitHub's pull request states. */
+	--pr-open: oklch(0.627 0.194 149.214);
+	--pr-merged: oklch(0.541 0.281 293.009);
+	--pr-closed: oklch(0.577 0.245 27.325);
+	/* Diff rows. */
+	--diff-add: oklch(0.627 0.194 149.214 / 12%);
+	--diff-del: oklch(0.577 0.245 27.325 / 10%);
+}
+
+.dark {
+	--background: oklch(0.147 0.004 49.25);
+	--foreground: oklch(0.985 0.001 106.423);
+	--card: oklch(0.19 0.005 52);
+	--card-foreground: oklch(0.985 0.001 106.423);
+	--popover: oklch(0.216 0.006 56.043);
+	--popover-foreground: oklch(0.985 0.001 106.423);
+	--primary: oklch(0.923 0.003 48.717);
+	--primary-foreground: oklch(0.216 0.006 56.043);
+	--secondary: oklch(0.274 0.006 286.033);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.268 0.007 34.298);
+	--muted-foreground: oklch(0.709 0.01 56.259);
+	--accent: oklch(0.268 0.007 34.298);
+	--accent-foreground: oklch(0.985 0.001 106.423);
+	--destructive: oklch(0.704 0.191 22.216);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 15%);
+	--ring: oklch(0.553 0.013 58.071);
+	--sidebar: oklch(0.17 0.005 50);
+	--sidebar-foreground: oklch(0.985 0.001 106.423);
+	--sidebar-primary: oklch(0.923 0.003 48.717);
+	--sidebar-primary-foreground: oklch(0.216 0.006 56.043);
+	--sidebar-accent: oklch(0.268 0.007 34.298);
+	--sidebar-accent-foreground: oklch(0.985 0.001 106.423);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.553 0.013 58.071);
+
+	--link: var(--foreground);
+	--brand-un: oklch(0.6 0.013 264);
+	--stop: oklch(0.704 0.191 22.216);
+	--dangerous: oklch(0.75 0.183 55.934);
+	--risky: oklch(0.828 0.189 84.429);
+	--safe: oklch(0.792 0.209 151.711);
+	--pr-open: oklch(0.792 0.209 151.711);
+	--pr-merged: oklch(0.702 0.183 293.541);
+	--pr-closed: oklch(0.704 0.191 22.216);
+	--diff-add: oklch(0.792 0.209 151.711 / 12%);
+	--diff-del: oklch(0.704 0.191 22.216 / 12%);
+}
+
+@theme inline {
+	--font-sans: 'IBM Plex Sans Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+	--font-heading: var(--font-sans);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-link: var(--link);
+	--color-brand-un: var(--brand-un);
+	--color-stop: var(--stop);
+	--color-dangerous: var(--dangerous);
+	--color-risky: var(--risky);
+	--color-safe: var(--safe);
+	--color-pr-open: var(--pr-open);
+	--color-pr-merged: var(--pr-merged);
+	--color-pr-closed: var(--pr-closed);
+	--color-diff-add: var(--diff-add);
+	--color-diff-del: var(--diff-del);
+	--ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	html {
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
+	body {
+		@apply bg-background text-foreground;
+		font-feature-settings: 'ss02';
+	}
+	h1,
+	h2,
+	h3 {
+		letter-spacing: -0.015em;
+		text-wrap: balance;
+	}
+	::selection {
+		background: color-mix(in oklab, var(--foreground) 18%, transparent);
+	}
+	/* Links in running text are foreground, so the underline is what marks them. */
+	a.text-link {
+		text-decoration-line: underline;
+		text-decoration-color: color-mix(in oklab, currentColor 30%, transparent);
+		text-underline-offset: 3px;
+	}
+	a.text-link:hover {
+		text-decoration-color: currentColor;
+	}
+	/* Tailwind v4 dropped the pointer on buttons; everything clickable gets it back. */
+	a[href],
+	button:not(:disabled),
+	summary,
+	label[for],
+	select:not(:disabled),
+	input[type='checkbox']:not(:disabled),
+	input[type='radio']:not(:disabled),
+	[role='button']:not([aria-disabled='true']),
+	[role='tab']:not([aria-disabled='true']),
+	[role='menuitem']:not([aria-disabled='true']),
+	[role='menuitemradio']:not([aria-disabled='true']),
+	[role='menuitemcheckbox']:not([aria-disabled='true']),
+	[role='option']:not([aria-disabled='true']),
+	[role='checkbox']:not([aria-disabled='true']),
+	[role='switch']:not([aria-disabled='true']),
+	[role='radio']:not([aria-disabled='true']) {
+		cursor: pointer;
+	}
+	/* Transitions between light and dark ease instead of flashing (apple-design §14). */
+	.theme-transition,
+	.theme-transition * {
+		transition:
+			background-color 200ms ease,
+			border-color 200ms ease,
+			color 200ms ease !important;
+	}
+}
+
+/* Translucent chrome: top bar, chat dock, graph panels (apple-design §12). */
+@utility glass {
+	background-color: color-mix(in oklab, var(--background) 72%, transparent);
+	backdrop-filter: blur(18px) saturate(170%);
+	-webkit-backdrop-filter: blur(18px) saturate(170%);
+	@media (prefers-reduced-transparency: reduce) {
+		background-color: var(--background);
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+}
+
+@utility glass-card {
+	background-color: color-mix(in oklab, var(--card) 78%, transparent);
+	backdrop-filter: blur(20px) saturate(170%);
+	-webkit-backdrop-filter: blur(20px) saturate(170%);
+	@media (prefers-reduced-transparency: reduce) {
+		background-color: var(--card);
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+}
+
+/* A brand artwork (static/brand) as an alpha mask painted in currentColor. */
+@utility brand-mask {
+	background-color: currentColor;
+	mask: var(--mask) center / contain no-repeat;
+	-webkit-mask: var(--mask) center / contain no-repeat;
+}
+
+/* Instant press feedback on pointer-down (apple-design §1). */
+@utility pressable {
+	transition: transform 100ms ease-out;
+	&:active:not(:disabled) {
+		transform: scale(0.98);
+	}
+}
+
+@utility scrollbar-thin {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in oklab, var(--foreground) 18%, transparent) transparent;
+}
+
+/* Hover cards (SourceMark) pop out of what they explain: a quick scale-up with a little overshoot,
+   from the trigger's side; a shorter fade on the way out. */
+.tip-pop {
+	--tip-dy: -4px;
+	transform-origin: var(--bits-tooltip-content-transform-origin);
+}
+.tip-pop[data-side='top'] {
+	--tip-dy: 4px;
+}
+.tip-pop[data-state$='open'] {
+	animation: tip-in 190ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+.tip-pop[data-state='closed'] {
+	animation: tip-out 110ms ease-in forwards;
+}
+@keyframes tip-in {
+	from {
+		opacity: 0;
+		transform: translateY(var(--tip-dy)) scale(0.9);
+	}
+}
+@keyframes tip-out {
+	to {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.tip-pop[data-state] {
+		animation-name: tip-fade;
+	}
+	@keyframes tip-fade {
+		from {
+			opacity: 0;
+		}
+	}
+}
+
+/* 3d-force-graph's hover tooltip, in the app's popover style. */
+.float-tooltip-kap {
+	font: 12px/1.35 var(--font-sans) !important;
+	color: var(--popover-foreground) !important;
+	background: color-mix(in oklab, var(--popover) 92%, transparent) !important;
+	border: 1px solid var(--border);
+	border-radius: calc(var(--radius) - 4px) !important;
+	padding: 6px 8px !important;
+	box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.35);
+	backdrop-filter: blur(12px);
+}
+.float-tooltip-kap .g-tip {
+	display: grid;
+	gap: 2px;
+}
+.float-tooltip-kap .g-tip span {
+	color: var(--muted-foreground);
+}
+
+/* The chat box flying between the dock and the side panel (ChatDock `toPanel`). The box moves and
+   resizes; its content is cropped, never squashed, so text keeps its size on the way. */
+::view-transition-group(chat) {
+	animation-duration: 340ms;
+	animation-timing-function: var(--ease-sheet);
+}
+::view-transition-image-pair(chat) {
+	overflow: hidden;
+	border-radius: var(--radius-xl);
+	box-shadow: 0 16px 48px -20px rgb(28 25 23 / 0.45);
+}
+::view-transition-old(chat),
+::view-transition-new(chat) {
+	width: 100%;
+	height: 100%;
+	object-fit: none;
+	object-position: left top;
+	animation-duration: 200ms;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 220ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	::before,
+	::after {
+		animation-duration: 1ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 1ms !important;
+		scroll-behavior: auto !important;
+	}
+}
