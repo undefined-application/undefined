@@ -191,6 +191,18 @@ export function addOverride(
 	return getReview(userId, id);
 }
 
+/**
+ * Undo a review: the row goes, and the PR shows as unreviewed again (or as its earlier review).
+ * A review still in the queue or running finishes into nothing: its updates hit no row.
+ */
+export function deleteReview(userId: string, id: string) {
+	getReview(userId, id);
+	db.delete(review)
+		.where(and(eq(review.id, id), eq(review.userId, userId)))
+		.run();
+	return { deleted: id };
+}
+
 export function markInterruptedReviews() {
 	db.update(review)
 		.set({

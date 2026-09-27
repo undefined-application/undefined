@@ -14,6 +14,7 @@
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
 	import ShieldAlertIcon from '@lucide/svelte/icons/shield-alert';
 	import TimerIcon from '@lucide/svelte/icons/timer';
+	import Undo2Icon from '@lucide/svelte/icons/undo-2';
 	import UserRoundPenIcon from '@lucide/svelte/icons/user-round-pen';
 	import { toast } from 'svelte-sonner';
 	import { goto, invalidate } from '$app/navigation';
@@ -21,6 +22,7 @@
 	import AskAuthor from '$lib/components/AskAuthor.svelte';
 	import LogoMark from '$lib/components/brand/LogoMark.svelte';
 	import ClaimList from '$lib/components/ClaimList.svelte';
+	import DeleteReviewDialog from '$lib/components/review/DeleteReviewDialog.svelte';
 	import DiffView, { CHANGE_CLASS } from '$lib/components/review/DiffView.svelte';
 	import ImpactGraph from '$lib/components/review/ImpactGraph.svelte';
 	import OverrideDialog from '$lib/components/review/OverrideDialog.svelte';
@@ -43,13 +45,16 @@
 
 	// Poll by re-running the page load while the review is in progress.
 	$effect(() => {
-		if (!running) return;
+		if (!running || undone) return;
 		const timer = setInterval(() => invalidate('app:review'), 1500);
 		return () => clearInterval(timer);
 	});
 
 	let tab = $state('conversation');
 	let overrideOpen = $state(false);
+	let undoOpen = $state(false);
+	/** Set once the review is deleted, so polling stops before we navigate away. */
+	let undone = $state(false);
 
 	const reviewed: Record<Verdict, string> = {
 		STOP: 'blocked this pull request',
@@ -115,12 +120,24 @@
 {/snippet}
 
 <div class="mx-auto max-w-6xl px-4 pt-6 pb-48 sm:px-8">
-	<a
-		href={resolve(`/scans/${data.scan.id}/pulls`)}
-		class="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-	>
-		<ArrowLeftIcon class="size-3.5" /> Pull requests
-	</a>
+	<div class="flex items-center justify-between gap-3">
+		<a
+			href={resolve(`/scans/${data.scan.id}/pulls`)}
+			class="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+		>
+			<ArrowLeftIcon class="size-3.5" /> Pull requests
+		</a>
+		{#if review.status === 'done'}
+			<Button
+				variant="ghost"
+				size="sm"
+				class="pressable text-muted-foreground hover:text-destructive"
+				onclick={() => (undoOpen = true)}
+			>
+				<Undo2Icon /> Undo review
+			</Button>
+		{/if}
+	</div>
 
 	<header class="mt-3 border-b border-border pb-5">
 		<h1 class="text-[1.75rem] leading-tight font-semibold tracking-[-0.02em] text-pretty">
@@ -183,9 +200,6 @@
 					<p class="text-xs text-muted-foreground">{review.stage ?? 'Waiting in the queue'}</p>
 				</div>
 			</div>
-			<p class="border-t border-border bg-muted/30 px-4 py-2.5 text-xs text-muted-foreground">
-				Usually takes about ten seconds.
-			</p>
 		</section>
 	{:else if review.status === 'failed' || !r || !verdict}
 		<section class="mt-8 max-w-3xl rounded-xl bg-destructive/5 p-5 ring-1 ring-destructive/25">
@@ -335,7 +349,7 @@
 											<div>
 												<p class="mb-1 font-medium">No related test for</p>
 												<ul class="flex flex-wrap gap-1">
-													{#each r.tests.missing as m (m)}
+													{#each r.tests.missing as m, i (i)}
 														<li
 															class="rounded-sm bg-risky/10 px-1.5 py-0.5 text-[11px] text-risky ring-1 ring-risky/25 ring-inset"
 														>
@@ -543,7 +557,7 @@
 						<p class="font-medium capitalize">{r.completeness.level}</p>
 						{#if r.completeness.reasons.length}
 							<ul class="mt-1 grid gap-1 text-muted-foreground">
-								{#each r.completeness.reasons as reason (reason)}<li>{reason}</li>{/each}
+								{#each r.completeness.reasons as reason, i (i)}<li>{reason}</li>{/each}
 							</ul>
 						{/if}
 					</section>
@@ -588,3 +602,13 @@
 		<OverrideDialog reviewId={review.id} floor={r.floor} bind:open={overrideOpen} />
 	{/if}
 </div>
+
+<DeleteReviewDialog
+	reviewId={review.id}
+	label="#{review.prNumber}"
+	bind:open={undoOpen}
+	ondeleted={async () => {
+		undone = true;
+		await goto(resolve(`/scans/${data.scan.id}/pulls`), { invalidateAll: true });
+	}}
+/>

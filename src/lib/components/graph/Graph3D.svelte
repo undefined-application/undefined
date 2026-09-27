@@ -32,6 +32,8 @@
 		autoRotate?: boolean;
 		/** Canvas colour; defaults to the page background. The canvas is opaque (bloom needs it). */
 		background?: string;
+		/** Screen pixels kept around the framed nodes; small canvases want less. */
+		padding?: { lit: number; all: number };
 		onselect?: (id: string | null) => void;
 		/** Double click: drill down one level. */
 		ondrill?: (node: GraphNode) => void;
@@ -46,6 +48,7 @@
 		interactive = true,
 		autoRotate = false,
 		background,
+		padding = { lit: 90, all: 48 },
 		onselect,
 		ondrill,
 		class: className
@@ -179,8 +182,8 @@
 		const ms = prefersReducedMotion.current ? 0 : 700;
 		if (lit && lit.size > 2) {
 			flownTo = selected;
-			g.zoomToFit(ms, 90, (n) => lit.has(n.id));
-		} else g.zoomToFit(ms, 48);
+			g.zoomToFit(ms, padding.lit, (n) => lit.has(n.id));
+		} else g.zoomToFit(ms, padding.all);
 	}
 
 	/** Point the camera at a node (search results, links from other pages). */
@@ -192,7 +195,7 @@
 
 	/** Frame the whole graph. */
 	export function fit() {
-		graph?.zoomToFit(prefersReducedMotion.current ? 0 : 600, 48);
+		graph?.zoomToFit(prefersReducedMotion.current ? 0 : 600, padding.all);
 	}
 
 	// Create the renderer once. three.js is browser-only and big: load it lazily.
@@ -339,7 +342,8 @@
 		flownTo = id;
 		// Frame the whole lit neighbourhood: the blast radius is the point, not the node.
 		const lit = focusOf(d, id).nodes;
-		if (lit.size > 2) g.zoomToFit(prefersReducedMotion.current ? 0 : 900, 90, (n) => lit.has(n.id));
+		if (lit.size > 2)
+			g.zoomToFit(prefersReducedMotion.current ? 0 : 900, padding.lit, (n) => lit.has(n.id));
 		else flyTo(g, node, d.level);
 	});
 

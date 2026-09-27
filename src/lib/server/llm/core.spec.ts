@@ -14,7 +14,10 @@ const req: ChatRequest = {
 	messages: [{ role: 'user', content: 'hi' }]
 };
 
-/** `plan` keys are `model` or `host/model`; each call pops the next status (default 200). */
+/**
+ * `plan` keys are `model` or `host/model`; each call pops the next status (default 200). Status 0
+ * answers 200 with no text, like a reasoning model that ran out of tokens while thinking.
+ */
 function fakeServer(plan: Record<string, number[]>) {
 	const calls: string[] = [];
 	const fakeFetch = (async (url: string, init: RequestInit) => {
@@ -22,7 +25,7 @@ function fakeServer(plan: Record<string, number[]>) {
 		const host = new URL(String(url)).hostname;
 		calls.push(host === 'a.test' ? model : `${host}/${model}`);
 		const status = (plan[`${host}/${model}`] ?? plan[model])?.shift() ?? 200;
-		if (status !== 200)
+		if (status !== 200 && status !== 0)
 			return new Response(JSON.stringify({ error: { message: 'busy' } }), { status });
 		return new Response(
 			JSON.stringify({
@@ -33,8 +36,8 @@ function fakeServer(plan: Record<string, number[]>) {
 				choices: [
 					{
 						index: 0,
-						finish_reason: 'stop',
-						message: { role: 'assistant', content: `answer from ${model}` }
+						finish_reason: status === 0 ? 'length' : 'stop',
+						message: { role: 'assistant', content: status === 0 ? '' : `answer from ${model}` }
 					}
 				],
 				usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 }
@@ -71,6 +74,16 @@ const opts = {
 const two = { ...opts, providers: [provider('a'), provider('b')] };
 
 describe('llm core', () => {
+	it('treats an empty answer as a model failure: next model, nothing cached', async () => {
+		const server = fakeServer({ 'fast-m': [0] });
+		const cache = memoryCache();
+		const llm = createLlm({ ...opts, fetch: server.fetch, cache });
+		const a = await llm.chat(req);
+		expect(a).toMatchObject({ model: 'strong-m', text: 'answer from strong-m', provider: 'a' });
+		expect(server.calls).toEqual(['fast-m', 'strong-m']);
+		expect(cache.size()).toBe(1);
+	});
+
 	it('answers, counts tokens, and serves an identical request from cache', async () => {
 		const server = fakeServer({});
 		const cache = memoryCache();

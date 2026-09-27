@@ -55,5 +55,6 @@
 		dark={mode.current === 'dark'}
 		background={mode.current === 'dark' ? '#161312' : '#ffffff'}
 		labels="focus"
+		padding={{ lit: 12, all: 12 }}
 	/>
 </div>

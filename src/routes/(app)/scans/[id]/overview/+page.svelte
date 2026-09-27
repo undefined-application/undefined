@@ -31,37 +31,43 @@
 	let allCritical = $state(false);
 
 	$effect(() => {
-		if (data.fences) redirectOn401(data.fences);
+		if (data.fences instanceof Promise) redirectOn401(data.fences);
 	});
-	// "Before you change it" counts the fences once they are traced; it renders without them first.
-	let fenceList = $state<Fence[] | null>(null);
+	// "Before you change it" counts the fences: at once when the load had them, else once traced.
+	let traced = $state<Fence[] | null>(null);
+	const fenceList = $derived(
+		data.fences && !(data.fences instanceof Promise) ? data.fences.fences : traced
+	);
 	$effect(() => {
 		let live = true;
-		fenceList = null;
+		traced = null;
+		if (!(data.fences instanceof Promise)) return;
 		data.fences
-			?.then((r) => {
-				if (live) fenceList = r.fences;
+			.then((r) => {
+				if (live) traced = r.fences;
 			})
 			.catch(() => {});
 		return () => {
 			live = false;
 		};
 	});
-	// The model's part of the wiki (intro, what each start file does): one
-	// call, cached by input hash. Every section renders without it first.
-	let overview = $state<WikiOverview | null>(null);
+	// The model's part of the wiki (intro, what each start file does): generated once and stored on
+	// the scan, usually by its last stage. Only a scan without one asks for it here; every section
+	// renders without it first.
+	let generated = $state<WikiOverview | null>(null);
 	let overviewLoading = $state(false);
+	const overview = $derived(data.overview ?? generated);
 	$effect(() => {
-		if (!pack || !data.llmEnabled || !browser) return;
+		if (!pack || data.overview || !data.llmEnabled || !browser) return;
 		let live = true;
-		overview = null;
+		generated = null;
 		overviewLoading = true;
 		apiFetch(`/api/scans/${scan.id}/summary`, { method: 'POST' })
 			.then(async (res) => (res.ok ? ((await res.json()) as WikiOverview) : null))
 			.catch(() => null)
 			.then((o) => {
 				if (!live) return;
-				overview = o;
+				generated = o;
 				overviewLoading = false;
 			});
 		return () => {

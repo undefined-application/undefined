@@ -392,11 +392,16 @@ export async function analyzePull(input: AnalyzePullInput): Promise<PullAnalysis
 			t.level !== 'low' ||
 			signalsHit.some((s) => s.path === t.path && s.line >= t.start && s.line <= t.end)
 	);
-	const missing = criticalTouched
-		.filter(
-			(t) => !related.some((r) => r.symbols.includes(t.name.slice(t.name.lastIndexOf(':') + 1)))
+	// Once per name: overloads and base/head copies of one function share it.
+	const missing = [
+		...new Set(
+			criticalTouched
+				.filter(
+					(t) => !related.some((r) => r.symbols.includes(t.name.slice(t.name.lastIndexOf(':') + 1)))
+				)
+				.map((t) => t.name)
 		)
-		.map((t) => t.name);
+	];
 
 	// 10. Completeness.
 	const reasons: { level: CompletenessLevel; text: string }[] = [];

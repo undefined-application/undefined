@@ -134,7 +134,8 @@ export async function wikiOverview(
 	const res = await llm.chat({
 		tier: 'strong',
 		promptId: PROMPT_ID,
-		maxTokens: 2500,
+		// Reasoning models think inside this budget before they answer: 2500 left them no room.
+		maxTokens: 8000,
 		messages: [
 			{ role: 'system', content: SYSTEM },
 			{ role: 'user', content: user }

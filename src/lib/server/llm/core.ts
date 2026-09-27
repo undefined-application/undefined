@@ -92,7 +92,18 @@ export function cacheKey(req: ChatRequest, model: string): string {
  * - `provider`: this key or broker is unusable (bad key, no credit, unreachable): skip it a while.
  * - `fatal`: the request itself is wrong (400, 422): every attempt would fail the same way.
  */
+/**
+ * The model answered with no text, typically a reasoning model that spent `max_tokens` thinking.
+ * Not the provider's fault: try the next model.
+ */
+export class EmptyResponseError extends Error {
+	constructor(model: string, finishReason: string | null | undefined) {
+		super(`LLM: ${model} returned no text (finish reason ${finishReason ?? 'unknown'})`);
+	}
+}
+
 export function classify(err: unknown): 'model' | 'provider' | 'fatal' {
+	if (err instanceof EmptyResponseError) return 'model';
 	const status = (err as { status?: number }).status;
 	if (status === undefined || status === 401 || status === 402 || status === 403) return 'provider';
 	if (status === 404 || status === 408 || status === 409 || status === 429 || status >= 500)
@@ -153,6 +164,7 @@ export function createLlm(opts: LlmOptions) {
 			max_tokens: req.maxTokens ?? 4000
 		});
 		const text = res.choices[0]?.message?.content ?? '';
+		if (!text.trim()) throw new EmptyResponseError(model, res.choices[0]?.finish_reason);
 		const result = {
 			text,
 			model,
@@ -161,13 +173,12 @@ export function createLlm(opts: LlmOptions) {
 			completionTokens: res.usage?.completion_tokens ?? 0,
 			cached: false
 		};
-		if (text)
-			opts.cache?.set(cacheKey(req, model), req.promptId, {
-				model,
-				response: text,
-				promptTokens: result.promptTokens,
-				completionTokens: result.completionTokens
-			});
+		opts.cache?.set(cacheKey(req, model), req.promptId, {
+			model,
+			response: text,
+			promptTokens: result.promptTokens,
+			completionTokens: result.completionTokens
+		});
 		return result;
 	}
 
@@ -192,7 +203,9 @@ export function createLlm(opts: LlmOptions) {
 					} catch (err) {
 						lastErr = err;
 						const kind = classify(err);
-						const status = (err as { status?: number }).status ?? 'network';
+						const status =
+							(err as { status?: number }).status ??
+							(err instanceof EmptyResponseError ? 'empty answer' : 'network');
 						if (kind === 'fatal') throw err;
 						if (kind === 'provider') {
 							p.downUntil = now() + cooldownMs;

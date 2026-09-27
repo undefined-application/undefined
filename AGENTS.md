@@ -172,7 +172,7 @@ src/lib/components/                 AppHeader, UserMenu, ThemeToggle, ClaimBadge
   chat/                             ChatDock (bottom composer + thread), thread.svelte.ts (per-scan conversations, localStorage)
   graph/                            Graph3D (3d-force-graph wrapper), scene.ts (palettes, focusOf), NodeInspector, BlastMeter, HeroGraph (login)
   scan/                             SystemNav, SystemCard, NewScanDialog, DeleteRepoDialog, ScanProgress, ScanFacts, CriticalPart, SystemSummary, toc.svelte.ts, actions.ts
-  review/                           PullList, PullStateIcon, ReviewRows, DiffView, ImpactGraph, OverrideDialog
+  review/                           PullList, PullStateIcon, ReviewRows, DiffView, ImpactGraph, OverrideDialog, DeleteReviewDialog
 src/lib/server/auth.ts              betterAuth config (GitHub only), githubAuthEnabled
 src/lib/server/guest.ts             guest mode: shared local user + cookie (no OAuth app configured)
 src/lib/server/github.ts            GitHub REST via user's OAuth token: repos, branches, pulls, commit → login
@@ -199,7 +199,7 @@ src/lib/server/chat/                agent.ts (JSON tool loop), tools.ts (search,
 src/routes/logout/                  POST: server-side sign-out → /login
 src/routes/api/github/repos/        GET user repos; [owner]/[repo] GET any repo; /branches; /pulls?state=
 src/routes/api/scans/               GET list, POST create; [id] GET (polled); [id]/docs (?format=md), graph, node?id=&impact= (details + reach), authorship, chat, summary
-src/routes/api/reviews/             GET list, POST create; [id] GET (polled); [id]/override POST
+src/routes/api/reviews/             GET list, POST create; [id] GET (polled), DELETE (undo); [id]/override POST
 src/routes/api/repos/[owner]/[name] DELETE: the repo's scans, reviews, analysis and clone (409 while a job runs)
 src/routes/login/                   GitHub-only sign-in, split screen with the live 3D graph
 src/routes/(app)/                   gated shell: glass top bar (logo, breadcrumb, theme, account)

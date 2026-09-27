@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { index, integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import type { WikiOverview } from '$lib/model';
 import type { ReferenceScope, ScanStats, ScanStatus } from '$lib/scan';
 import { user } from './auth.schema';
 
@@ -35,6 +36,8 @@ export const scanRun = sqliteTable(
 		error: text('error'),
 		tokensUsed: integer('tokens_used').notNull().default(0),
 		stats: text('stats', { mode: 'json' }).$type<ScanStats>(),
+		/** The wiki's AI overview, generated once (stage 5 or the first wiki visit) and kept. */
+		overview: text('overview', { mode: 'json' }).$type<WikiOverview>(),
 		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 			.notNull(),
