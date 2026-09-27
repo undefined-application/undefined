@@ -21,8 +21,6 @@ Turn unknown legacy code into a system you can change with confidence.<br>
 
 <a href="https://github.com/undefined-application/undefined/blob/main/assets/demo-raw.mp4"><img alt="undefined demo video" src="assets/demo-poster.jpg" width="100%"></a>
 
-<a href="https://github.com/undefined-application/undefined/blob/main/assets/demo-raw.mp4">▶ Watch the demo (1:28)</a>
-
 </div>
 
 <br>
