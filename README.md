@@ -19,7 +19,7 @@ Turn unknown legacy code into a system you can change with confidence.<br>
 
 <br>
 
-<a href="https://github.com/undefined-application/undefined/blob/main/assets/demo-raw.mp4"><img alt="undefined demo video" src="assets/demo-poster.jpg" width="100%"></a>
+<img alt="undefined demo" src="assets/demo-raw.gif" width="100%">
 
 </div>
 
