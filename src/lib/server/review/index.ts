@@ -83,7 +83,7 @@ async function runReview(id: string, userId: string, token: string) {
 
 		const model = llm();
 		if (model) {
-			set({ stage: 'Asking the model for a rationale' });
+			set({ stage: 'Analyzing with an LLM' });
 			try {
 				await explainWithLlm(analysis, model);
 			} catch (err) {

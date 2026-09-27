@@ -9,6 +9,9 @@ import { llm } from '$lib/server/llm';
 import { loadModel } from '$lib/server/scan/model';
 import type { RequestHandler } from './$types';
 
+/** An answer never arrives sooner than this, even from the cache: an instant reply reads as canned. */
+const MIN_ANSWER_MS = 3000;
+
 /** Body: `{ messages: [{role, content}] }` → answer + validated claims (plan §6.2). */
 export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const body = await request.json().catch(() => error(400, 'Body must be JSON'));
@@ -20,6 +23,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		.slice(-10);
 	if (!turns.length || turns.at(-1)!.role !== 'user')
 		error(400, 'Last message must be from the user');
+	const started = Date.now();
 	const model = llm();
 	if (!model) error(503, 'No LLM configured (LLM_BASE_URL / LLM_API_KEY)');
 	const view = loadModel(locals.user!.id, params.id);
@@ -31,5 +35,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		.set({ tokensUsed: sql`${scanRun.tokensUsed} + ${answer.tokens}` })
 		.where(eq(scanRun.id, params.id))
 		.run();
+	const wait = MIN_ANSWER_MS - (Date.now() - started);
+	if (wait > 0) await new Promise((r) => setTimeout(r, wait));
 	return json(answer);
 };
