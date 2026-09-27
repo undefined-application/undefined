@@ -19,10 +19,7 @@ Turn unknown legacy code into a system you can change with confidence.<br>
 
 <br>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/login-dark.png">
-  <img alt="The undefined sign-in page: the tagline on the left, a live 3D system graph lighting up the blast radius of one function on the right" src="assets/login-light.png" width="100%">
-</picture>
+<video src="https://raw.githubusercontent.com/undefined-application/undefined/main/assets/demo-raw.mp4" controls muted width="100%"></video>
 
 </div>
 
